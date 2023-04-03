@@ -7,13 +7,19 @@ platform :ios do
 
     keychain_password = SecureRandom.uuid
 
-    create_keychain(
-      name: 'ios-build.keychain',
-      password: keychain_password,
-      default_keychain: true,
-      unlock: true,
-      timeout: 3600
-    )
+    begin
+      create_keychain(
+        name: 'ios-build.keychain',
+        password: keychain_password,
+        default_keychain: true,
+        unlock: true,
+        timeout: 3600
+      )
+    rescue => ex
+      UI.error(ex)
+    ensure
+      delete_keychain(name: 'ios-build.keychain')
+    end
 
     if @is_split_cer
       import_certificate(
@@ -140,33 +146,26 @@ platform :ios do
     use_build_sdk = !ENV['BUILD_SDK'].empty?
     use_build_destination = !ENV['BUILD_DESTINATION'].empty?
     use_cloned_source_packages_path = !ENV['CLONED_SOURCE_PACKAGES_PATH'].empty?
-    begin
-      build_app(
-        workspace: use_workspace ? ENV['WORKSPACE_PATH'] : nil,
-        project: !use_workspace ? ENV['PROJECT_PATH'] : nil,
-        configuration: ENV['CONFIGURATION'],
-        scheme: ENV['SCHEME'],
-        output_directory: File.dirname(ENV['OUTPUT_PATH']),
-        output_name: File.basename(ENV['OUTPUT_PATH']),
-        clean: true,
-        cloned_source_packages_path:
-          if use_cloned_source_packages_path
-            ENV['CLONED_SOURCE_PACKAGES_PATH']
-          else
-            nil
-          end,
-        export_method: ENV['EXPORT_METHOD'],
-        export_options: use_export_options ? ENV['EXPORT_OPTIONS'] : nil,
-        skip_profile_detection: use_export_options,
-        sdk: use_build_sdk ? ENV['BUILD_SDK'] : nil,
-        destination: use_build_destination ? ENV['BUILD_DESTINATION'] : nil
-      )
-          item1 # This causes an error
-    rescue => ex
-      UI.error(ex)
-    ensure
-      delete_keychain(name: 'ios-build.keychain')
-    end
+    build_app(
+      workspace: use_workspace ? ENV['WORKSPACE_PATH'] : nil,
+      project: !use_workspace ? ENV['PROJECT_PATH'] : nil,
+      configuration: ENV['CONFIGURATION'],
+      scheme: ENV['SCHEME'],
+      output_directory: File.dirname(ENV['OUTPUT_PATH']),
+      output_name: File.basename(ENV['OUTPUT_PATH']),
+      clean: true,
+      cloned_source_packages_path:
+        if use_cloned_source_packages_path
+          ENV['CLONED_SOURCE_PACKAGES_PATH']
+        else
+          nil
+        end,
+      export_method: ENV['EXPORT_METHOD'],
+      export_options: use_export_options ? ENV['EXPORT_OPTIONS'] : nil,
+      skip_profile_detection: use_export_options,
+      sdk: use_build_sdk ? ENV['BUILD_SDK'] : nil,
+      destination: use_build_destination ? ENV['BUILD_DESTINATION'] : nil
+    )
   end
 
   # https://github.com/CocoaPods/Xcodeproj/issues/505#issuecomment-584699008
