@@ -1,4 +1,4 @@
-name: "iOS Build Action"
+name: "TUXMART iOS Build Action"
 description: "Build iOS project (.xcodeproj, .xcworkspace), and export ipa with custom entitlements"
 inputs:
   p12-key-base64:
@@ -111,5 +111,5 @@ inputs:
     required: false
     default: ""
 runs:
-  using: "node12"
+  using: "node16"
   main: "dist/index.js"
