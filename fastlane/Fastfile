@@ -13,13 +13,19 @@ platform :ios do
       keychain_name = 'ios-build.keychain'
     end
 
-    create_keychain(
-      name: keychain_name,
-      password: keychain_password,
-      default_keychain: true,
-      unlock: true,
-      timeout: 3600
-    )
+    begin
+      create_keychain(
+        name: 'ios-build.keychain',
+        password: keychain_password,
+        default_keychain: true,
+        unlock: true,
+        timeout: 3600
+      )
+    rescue => ex
+      UI.error(ex)
+    ensure
+      delete_keychain(name: 'ios-build.keychain')
+    end
 
     if @is_split_cer
       import_certificate(
