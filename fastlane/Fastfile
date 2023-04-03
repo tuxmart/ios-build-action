@@ -6,20 +6,18 @@ platform :ios do
     decode_file
 
     keychain_password = SecureRandom.uuid
-
     begin
-      create_keychain(
-        name: 'ios-build.keychain',
-        password: keychain_password,
-        default_keychain: true,
-        unlock: true,
-        timeout: 3600
-      )
+      delete_keychain(name: 'ios-build.keychain')
     rescue => ex
       UI.error(ex)
-    ensure
-      delete_keychain(name: 'ios-build.keychain')
     end
+    create_keychain(
+      name: 'ios-build.keychain',
+      password: keychain_password,
+      default_keychain: true,
+      unlock: true,
+      timeout: 3600
+    )
 
     if @is_split_cer
       import_certificate(
