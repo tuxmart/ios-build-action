@@ -14,12 +14,12 @@ platform :ios do
     end
 
     begin
-      delete_keychain(name: 'ios-build.keychain')
+      delete_keychain(name: keychain_name)
     rescue => ex
       UI.error(ex)
     end
     create_keychain(
-      name: 'ios-build.keychain',
+      name: keychain_name,
       password: keychain_password,
       default_keychain: true,
       unlock: true,
