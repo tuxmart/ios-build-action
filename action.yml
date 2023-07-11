@@ -118,6 +118,10 @@ inputs:
     description: 'Custom Keychain Name'
     required: false
     default: "ios-build.keychain"
+  skip-keychain-deletion:
+    description: 'Skip Keychain deletion'
+    required: false
+    default: ""
 runs:
   using: "node20"
   main: "dist/index.js"
