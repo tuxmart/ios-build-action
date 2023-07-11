@@ -5,7 +5,6 @@ platform :ios do
   lane :export_ipa do
     decode_file
 
-    keychain_password = SecureRandom.uuid
     keychain_name = nil
     if !ENV['CUSTOM_KEYCHAIN_NAME'].empty?
       keychain_name = ENV['CUSTOM_KEYCHAIN_NAME']
@@ -13,14 +12,9 @@ platform :ios do
       keychain_name = 'ios-build.keychain'
     end
 
-    begin
-      delete_keychain(name: keychain_name)
-    rescue => ex
-      UI.error(ex)
-    end
     create_keychain(
       name: keychain_name,
-      password: keychain_password,
+      password: "",
       default_keychain: false,
       unlock: true,
       timeout: 3600
@@ -36,7 +30,7 @@ platform :ios do
           end,
         certificate_password: ENV['CERTIFICATE_PASSWORD'],
         keychain_name: keychain_name,
-        keychain_password: keychain_password,
+        keychain_password: "",
         log_output: true
       )
       import_certificate(
@@ -48,7 +42,7 @@ platform :ios do
           end,
         certificate_password: ENV['CERTIFICATE_PASSWORD'],
         keychain_name: keychain_name,
-        keychain_password: keychain_password,
+        keychain_password: "",
         log_output: true
       )
     else
@@ -57,7 +51,7 @@ platform :ios do
           !ENV['P12_PATH'].empty? ? ENV['P12_PATH'] : 'ios-build.p12',
         certificate_password: ENV['CERTIFICATE_PASSWORD'],
         keychain_name: keychain_name,
-        keychain_password: keychain_password,
+        keychain_password: "",
         log_output: true
       )
     end
@@ -220,8 +214,10 @@ platform :ios do
       destination: use_build_destination ? ENV['BUILD_DESTINATION'] : nil,
       build_path: use_build_path ? ENV['BUILD_PATH'] : nil
     )
-
-    delete_keychain(name: keychain_name)
+    # if ENV['SKIP_KEYCHAIN_DELETION'].empty? ||
+    #      ENV['SKIP_KEYCHAIN_DELETION'] != 'true'
+    #   delete_keychain(name: keychain_name)
+    # end
   end
 
   # https://github.com/CocoaPods/Xcodeproj/issues/505#issuecomment-584699008
