@@ -13,6 +13,11 @@ platform :ios do
       keychain_name = 'ios-build.keychain'
     end
 
+    begin
+      delete_keychain(name: keychain_name)
+    rescue => ex
+      UI.error(ex)
+    end
     create_keychain(
       name: keychain_name,
       password: keychain_password,
